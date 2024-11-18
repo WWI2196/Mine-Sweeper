@@ -21,7 +21,7 @@ A an implementation of the classic Minesweeper game built with Java Swing, featu
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/minesweeper.git
+git clone https://github.com/WWI2196/Mine-Sweeper.git
 ```
 
 2. Navigate to the project directory:
