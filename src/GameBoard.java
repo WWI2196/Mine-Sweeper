@@ -176,22 +176,26 @@ public class GameBoard extends JPanel {
      * @param won True if game was won, false if lost
      */
     private void gameOver(boolean won) {
-        // Reveal all cells
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (won && cells[i][j].isMine()) {
-                    cells[i][j].flag(); // Flag all mines on win
-                } else {
-                    cells[i][j].reveal();
+    // Reveal all cells
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (won && cells[i][j].isMine()) {
+                cells[i][j].flag(); // Flag all mines on win
+            } else {
+                cells[i][j].reveal();
+                // Mark wrongly flagged cells with X
+                if (!won && cells[i][j].isFlagged() && !cells[i][j].isMine()) {
+                    cells[i][j].markWrongFlag();
                 }
             }
         }
-
-        // Notify listeners
-        for (GameListener listener : gameListeners) {
-            listener.onGameOver(won);
-        }
     }
+
+    // Notify listeners
+    for (GameListener listener : gameListeners) {
+        listener.onGameOver(won);
+    }
+}
 
     /**
      * Mouse listener for cell interaction
