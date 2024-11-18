@@ -208,10 +208,12 @@ public class Minisweeper extends JFrame {
         
         // Add hover effect
         button.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(GameConstants.PRIMARY_COLOR.darker());
             }
             
+            @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(GameConstants.PRIMARY_COLOR);
             }
@@ -236,10 +238,10 @@ public class Minisweeper extends JFrame {
      */
     private void showHelp() {
         StringBuilder helpText = new StringBuilder("<html><body style='width: 250px; padding: 5px;'>");
-        helpText.append("<div style='color: " + String.format("#%02x%02x%02x", 
-            GameConstants.PRIMARY_COLOR.getRed(),
-            GameConstants.PRIMARY_COLOR.getGreen(),
-            GameConstants.PRIMARY_COLOR.getBlue()) + ";'>");
+        helpText.append("<div style='color: ").append(String.format("#%02x%02x%02x", 
+                GameConstants.PRIMARY_COLOR.getRed(),
+                GameConstants.PRIMARY_COLOR.getGreen(),
+                GameConstants.PRIMARY_COLOR.getBlue())).append(";'>");
         helpText.append("<h2>How to Play Minesweeper</h2></div>");
         helpText.append("<ul>");
         for (String message : GameConstants.HELP_MESSAGES) {
@@ -414,12 +416,12 @@ public class Minisweeper extends JFrame {
 
     /**
      * Main method to start the application
+     * @param args
      */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
         }
 
         SwingUtilities.invokeLater(() -> {

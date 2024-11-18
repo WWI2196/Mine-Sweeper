@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Represents the game board component and handles game logic.
+/*
+  Handles the game board components and game logic.
  */
 public class GameBoard extends JPanel {
     private Cell[][] cells;
@@ -18,20 +18,12 @@ public class GameBoard extends JPanel {
     private boolean firstClick;
     private final List<GameListener> gameListeners;
 
-    /**
-     * Interface for game event listeners
-     */
     public interface GameListener {
         void onGameStart();
         void onGameOver(boolean won);
         void onMineCountChanged(int remainingMines);
     }
 
-    /**
-     * Constructor for GameBoard
-     * @param size Board size (width and height)
-     * @param mines Number of mines to place
-     */
     public GameBoard(int size, int mines) {
         this.rows = size;
         this.cols = size;
@@ -43,17 +35,14 @@ public class GameBoard extends JPanel {
         initializeBoard();
     }
 
-    /**
-     * Initializes the game board
-     */
     private void initializeBoard() {
-    // Use GridLayout with no gaps between cells
+    // to set the gridLayout with no gaps between cells
     setLayout(new GridLayout(rows, cols, 0, 0));
     setBorder(BorderFactory.createLineBorder(GameConstants.PRIMARY_COLOR, 2));
     setBackground(GameConstants.BACKGROUND_COLOR);
     cells = new Cell[rows][cols];
 
-    // Create cells
+    // to create cells
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             cells[i][j] = new Cell(i, j);
@@ -62,18 +51,13 @@ public class GameBoard extends JPanel {
         }
     }
 
-    // Set the preferred size based on cell dimensions
+    // to set board size based on cell dimensions
     int boardWidth = cols * GameConstants.CELL_SIZE;
     int boardHeight = rows * GameConstants.CELL_SIZE;
     setPreferredSize(new Dimension(boardWidth, boardHeight));
     setMinimumSize(new Dimension(boardWidth, boardHeight));
 }
 
-    /**
-     * Places mines on the board, avoiding the first clicked cell
-     * @param firstRow Row of first click
-     * @param firstCol Column of first click
-     */
     private void placeMines(int firstRow, int firstCol) {
         Random random = new Random();
         int minesPlaced = 0;
@@ -82,7 +66,7 @@ public class GameBoard extends JPanel {
             int row = random.nextInt(rows);
             int col = random.nextInt(cols);
 
-            // Avoid placing mine on first click or already mined cell
+            // to avoid placing mine on first click or already mined cell
             if (!cells[row][col].isMine() && 
                 (row < firstRow - 1 || row > firstRow + 1 || 
                  col < firstCol - 1 || col > firstCol + 1)) {
@@ -91,13 +75,11 @@ public class GameBoard extends JPanel {
             }
         }
 
-        // Calculate numbers for all cells
+        // to calculate numbers for all cells
         calculateNumbers();
     }
 
-    /**
-     * Calculates the number of adjacent mines for each cell
-     */
+    // function to calculate numbers for the cells
     private void calculateNumbers() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -108,12 +90,7 @@ public class GameBoard extends JPanel {
         }
     }
 
-    /**
-     * Counts mines adjacent to a cell
-     * @param row Cell row
-     * @param col Cell column
-     * @return Number of adjacent mines
-     */
+    // to count mines adjacent to a cell
     private int countAdjacentMines(int row, int col) {
         int count = 0;
         for (int i = -1; i <= 1; i++) {
@@ -128,11 +105,7 @@ public class GameBoard extends JPanel {
         return count;
     }
 
-    /**
-     * Reveals a cell and its adjacent cells if empty
-     * @param row Cell row
-     * @param col Cell column
-     */
+    // to reveal a cell and its adjacent cells if empty
     private void revealCell(int row, int col) {
         if (!isValidCell(row, col) || cells[row][col].isRevealed() || cells[row][col].isFlagged()) {
             return;
@@ -141,7 +114,7 @@ public class GameBoard extends JPanel {
         cells[row][col].reveal();
 
         if (cells[row][col].getAdjacentMines() == 0) {
-            // Reveal all adjacent cells for empty cell
+            // to reveal all adjacent cells for empty cell
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     revealCell(row + i, col + j);
@@ -150,16 +123,11 @@ public class GameBoard extends JPanel {
         }
     }
 
-    /**
-     * Checks if coordinates are within board boundaries
-     */
     private boolean isValidCell(int row, int col) {
         return row >= 0 && row < rows && col >= 0 && col < cols;
     }
 
-    /**
-     * Checks if the game is won
-     */
+    //to checks if the game is won
     private void checkWin() {
         int unrevealed = 0;
         for (int i = 0; i < rows; i++) {
@@ -174,35 +142,28 @@ public class GameBoard extends JPanel {
         }
     }
 
-    /**
-     * Handles game over state
-     * @param won True if game was won, false if lost
-     */
+    // to handle game over 
     private void gameOver(boolean won) {
-    // Reveal all cells
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (won && cells[i][j].isMine()) {
-                cells[i][j].flag(); // Flag all mines on win
-            } else {
-                cells[i][j].reveal();
-                // Mark wrongly flagged cells with X
-                if (!won && cells[i][j].isFlagged() && !cells[i][j].isMine()) {
-                    cells[i][j].markWrongFlag();
+        // Reveal all cells
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (won && cells[i][j].isMine()) {
+                    cells[i][j].flag(); // to flag all mines on win
+                } else {
+                    cells[i][j].reveal();
+                    //to mark wrongly flagged cells with X
+                    if (!won && cells[i][j].isFlagged() && !cells[i][j].isMine()) {
+                        cells[i][j].markWrongFlag();
+                    }
                 }
             }
         }
+
+        for (GameListener listener : gameListeners) {
+            listener.onGameOver(won);
+        }
     }
 
-    // Notify listeners
-    for (GameListener listener : gameListeners) {
-        listener.onGameOver(won);
-    }
-}
-
-    /**
-     * Mouse listener for cell interaction
-     */
     private class CellMouseListener extends MouseAdapter {
         private final Cell cell;
 
@@ -212,12 +173,12 @@ public class GameBoard extends JPanel {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            // Ignore if game is over
+            // to ignore mouse clicks if game is over
             if (cell.isRevealed() && cell.isMine()) {
                 return;
             }
 
-            // Start game on first click
+            // to start game on first click
             if (firstClick) {
                 for (GameListener listener : gameListeners) {
                     listener.onGameStart();
@@ -225,7 +186,7 @@ public class GameBoard extends JPanel {
             }
 
             if (e.getButton() == MouseEvent.BUTTON3) {
-                // Right click - flag
+                // right click - flag
                 if (!cell.isRevealed()) {
                     if (cell.isFlagged()) {
                         cell.unflag();
@@ -234,13 +195,13 @@ public class GameBoard extends JPanel {
                         cell.flag();
                         remainingMines--;
                     }
-                    // Notify mine count change
+                    // to notify mine count change
                     for (GameListener listener : gameListeners) {
                         listener.onMineCountChanged(remainingMines);
                     }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1 && !cell.isFlagged()) {
-                // Left click - reveal
+                // left click - reveal
                 if (firstClick) {
                     placeMines(cell.getRow(), cell.getCol());
                     firstClick = false;
@@ -257,34 +218,18 @@ public class GameBoard extends JPanel {
         }
     }
 
-    /**
-     * Adds a game listener
-     * @param listener The listener to add
-     */
     public void addGameListener(GameListener listener) {
         gameListeners.add(listener);
     }
 
-        /**
-      * Gets the current board dimension (number of rows/columns)
-      * @return The board dimension size (e.g., 10 for a 10x10 board)
-      */
      public int getBoardDimension() {
          return rows;
      }
 
-     /**
-      * Gets the board size as a formatted string (e.g., "10x10")
-      * @return The board size as a string
-      */
      public String getBoardSizeString() {
          return rows + "x" + cols;
      }
-     
-    /**
-     * Gets the current number of mines
-     * @return The total number of mines
-     */
+
     public int getMineCount() {
         return totalMines;
     }
