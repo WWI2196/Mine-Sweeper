@@ -2,9 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * Main class for the Minesweeper game.
- * Handles the main window, game initialization, and user interface.
+/*
+class to handle the main window, game initialization, and user interface.
  */
 public class Minisweeper extends JFrame {
     private GameBoard board;
@@ -14,9 +13,7 @@ public class Minisweeper extends JFrame {
     private boolean gameStarted;
     private JComboBox<String> sizeSelector;
 
-    /**
-     * Constructor initializes the main game window.
-     */
+    // to initializes the main game window.
     public Minisweeper() {
         setTitle(GameConstants.GAME_TITLE);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -29,14 +26,9 @@ public class Minisweeper extends JFrame {
         
         initializeComponents();
         initializeGame();
-        setupKeyBindings();
     }
 
-    /**
-     * Initialize all component variables with modern styling
-     */
     private void initializeComponents() {
-        // Initialize labels with modern styling
         timerLabel = new JLabel("Time: 00:00");
         timerLabel.setFont(GameConstants.LABEL_FONT);
         timerLabel.setForeground(GameConstants.PRIMARY_COLOR);
@@ -45,30 +37,23 @@ public class Minisweeper extends JFrame {
                                                 GameConstants.SMALL_BOARD_MINES));
         mineCountLabel.setFont(GameConstants.LABEL_FONT);
         mineCountLabel.setForeground(GameConstants.PRIMARY_COLOR);
-        
-        // Initialize timer
+
         gameTimer = new GameTimer(timerLabel);
-        
-        // Initialize size selector with modern styling
+
         sizeSelector = new JComboBox<>(new String[]{"10x10", "15x15"});
-        styleComboBox(sizeSelector);
-        
-        // Initialize game state
+        comboBox(sizeSelector);
+
         gameStarted = false;
     }
 
-    /**
-     * Initializes the game components and layout with modern styling.
-     */
     private void initializeGame() {
-        // Set window properties
+        // window properties
         setBackground(GameConstants.BACKGROUND_COLOR);
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // Set up menu bar with modern styling
-        setJMenuBar(createModernMenuBar());
+        // Set up menu bar 
+        setJMenuBar(createMenuBar());
 
-        // Initialize the game board with default size
         board = new GameBoard(GameConstants.SMALL_BOARD_SIZE, GameConstants.SMALL_BOARD_MINES);
         board.addGameListener(new GameBoard.GameListener() {
             @Override
@@ -90,37 +75,32 @@ public class Minisweeper extends JFrame {
             }
         });
 
-        // Create main panel with modern styling
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(GameConstants.BACKGROUND_COLOR);
-        mainPanel.add(createModernTopPanel(), BorderLayout.NORTH);
+        mainPanel.add(createTopPanel(), BorderLayout.NORTH);
         mainPanel.add(board, BorderLayout.CENTER);
-        mainPanel.add(createModernStatusBar(), BorderLayout.SOUTH);
+        mainPanel.add(createStatusBar(), BorderLayout.SOUTH);
         
         setContentPane(mainPanel);
 
-        // Pack and center the window
+        // to center the window
         pack();
         setLocationRelativeTo(null);
         setResizable(false);
     }
 
-    /**
-     * Creates modern styled menu bar
-     */
-    private JMenuBar createModernMenuBar() {
+    private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(GameConstants.BACKGROUND_COLOR);
         
-        // Game Menu
+        // game menu
         JMenu gameMenu = new JMenu(GameConstants.MENU_GAME);
         gameMenu.setFont(GameConstants.LABEL_FONT);
         gameMenu.setForeground(GameConstants.PRIMARY_COLOR);
         
         JMenuItem newGameItem = new JMenuItem(GameConstants.MENU_NEW_GAME);
         JMenuItem exitItem = new JMenuItem(GameConstants.MENU_EXIT);
-        
-        // Style menu items
+
         for (JMenuItem item : new JMenuItem[]{newGameItem, exitItem}) {
             item.setFont(GameConstants.LABEL_FONT);
             item.setBackground(GameConstants.BACKGROUND_COLOR);
@@ -135,8 +115,7 @@ public class Minisweeper extends JFrame {
         gameMenu.add(newGameItem);
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
-        
-        // Help Menu
+
         JMenu helpMenu = new JMenu(GameConstants.MENU_HELP);
         helpMenu.setFont(GameConstants.LABEL_FONT);
         helpMenu.setForeground(GameConstants.PRIMARY_COLOR);
@@ -153,20 +132,17 @@ public class Minisweeper extends JFrame {
         return menuBar;
     }
 
-    /**
-     * Creates the modern top panel with game controls
-     */
-    private JPanel createModernTopPanel() {
+    // to create top panel 
+    private JPanel createTopPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setBackground(GameConstants.BACKGROUND_COLOR);
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
 
-        // Create modern new game button
-        JButton newGameButton = createStyledButton(GameConstants.NEW_GAME_BUTTON_TEXT);
+        // create new game button
+        JButton newGameButton = createButtons(GameConstants.NEW_GAME_BUTTON_TEXT);
         newGameButton.addActionListener(e -> startNewGame(getSelectedBoardSize()));
 
-        // Add components with modern spacing
         topPanel.add(mineCountLabel);
         topPanel.add(Box.createHorizontalGlue());
         topPanel.add(newGameButton);
@@ -178,10 +154,8 @@ public class Minisweeper extends JFrame {
         return topPanel;
     }
 
-    /**
-     * Creates modern status bar
-     */
-    private JPanel createModernStatusBar() {
+    // create status bar at the bottom
+    private JPanel createStatusBar() {
         JPanel statusBar = new JPanel();
         statusBar.setBackground(GameConstants.BACKGROUND_COLOR);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -194,10 +168,7 @@ public class Minisweeper extends JFrame {
         return statusBar;
     }
 
-    /**
-     * Creates modern styled button
-     */
-    private JButton createStyledButton(String text) {
+    private JButton createButtons(String text) {
         JButton button = new JButton(text);
         button.setFont(GameConstants.BUTTON_FONT);
         button.setBackground(GameConstants.PRIMARY_COLOR);
@@ -206,7 +177,7 @@ public class Minisweeper extends JFrame {
         button.setFocusPainted(false);
         button.setContentAreaFilled(true);
         
-        // Add hover effect
+        // to add hover effect
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -222,10 +193,8 @@ public class Minisweeper extends JFrame {
         return button;
     }
 
-    /**
-     * Styles combo box with modern look
-     */
-    private void styleComboBox(JComboBox<String> comboBox) {
+    // custom combo box
+    private void comboBox(JComboBox<String> comboBox) {
         comboBox.setFont(GameConstants.LABEL_FONT);
         comboBox.setBackground(GameConstants.CELL_BACKGROUND_COLOR);
         comboBox.setForeground(GameConstants.PRIMARY_COLOR);
@@ -233,9 +202,6 @@ public class Minisweeper extends JFrame {
         comboBox.addActionListener(e -> handleBoardSizeChange(comboBox.getSelectedItem().toString()));
     }
 
-    /**
-     * Shows the help dialog with modern styling
-     */
     private void showHelp() {
         StringBuilder helpText = new StringBuilder("<html><body style='width: 250px; padding: 5px;'>");
         helpText.append("<div style='color: ").append(String.format("#%02x%02x%02x", 
@@ -247,34 +213,25 @@ public class Minisweeper extends JFrame {
         for (String message : GameConstants.HELP_MESSAGES) {
             helpText.append("<li>").append(message).append("</li>");
         }
-        helpText.append("</ul>");
-        helpText.append("<h3>Keyboard Shortcuts:</h3>");
-        helpText.append("<ul>");
-        helpText.append("<li>Ctrl + N: New Game</li>");
-        helpText.append("<li>Ctrl + Q: Quit Game</li>");
-        helpText.append("</ul>");
-        helpText.append("</body></html>");
-
+        
         JOptionPane.showMessageDialog(this,
             new JLabel(helpText.toString()),
             "Help",
             JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Starts a new game with the specified board size.
-     */
+    // to start a new game
     private void startNewGame(String size) {
         int boardSize = size.equals("10x10") ? GameConstants.SMALL_BOARD_SIZE 
                                            : GameConstants.LARGE_BOARD_SIZE;
         int mineCount = size.equals("10x10") ? GameConstants.SMALL_BOARD_MINES 
                                             : GameConstants.LARGE_BOARD_MINES;
 
-        // Reset game state
+        // to reset game state
         gameStarted = false;
         gameTimer.reset();
         
-        // Remove old board and create new one
+        // to remove old board and create new one
         remove(board);
         board = new GameBoard(boardSize, mineCount);
         board.addGameListener(new GameBoard.GameListener() {
@@ -297,7 +254,6 @@ public class Minisweeper extends JFrame {
             }
         });
 
-        // Update UI
         ((JPanel)getContentPane()).add(board, BorderLayout.CENTER);
         updateMineCount(mineCount);
         pack();
@@ -305,38 +261,33 @@ public class Minisweeper extends JFrame {
         repaint();
     }
 
-    /**
-     * Handles the game over state with modern dialog
-     */
+    // to handle game over
     private void handleGameOver(boolean won) {
-    gameTimer.stop();
-    String message = won ? 
-        String.format(GameConstants.GAME_WON_MESSAGE, gameTimer.getFormattedTime()) :
-        String.format(GameConstants.GAME_LOST_MESSAGE, gameTimer.getFormattedTime());
-    
-    
-    
-    Object[] options = {"New Game", "Quit"};
-    int choice = JOptionPane.showOptionDialog(this,
-        message,
-        GameConstants.GAME_OVER_TITLE,
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.INFORMATION_MESSAGE,
-        null,
-        options,
-        options[0]);
+        gameTimer.stop();
+        String message = won ? 
+            String.format(GameConstants.GAME_WON_MESSAGE, gameTimer.getFormattedTime()) :
+            String.format(GameConstants.GAME_LOST_MESSAGE, gameTimer.getFormattedTime());
 
-    if (choice == 0) {
-        startNewGame(getSelectedBoardSize());
-    } else if (choice == 1 || choice == JOptionPane.CLOSED_OPTION) {
-        dispose(); // Properly dispose of the window
-        System.exit(0); // Exit the application
+
+
+        Object[] options = {"New Game", "Quit"};
+        int choice = JOptionPane.showOptionDialog(this,
+            message,
+            GameConstants.GAME_OVER_TITLE,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            options,
+            options[0]);
+
+        if (choice == 0) {
+            startNewGame(getSelectedBoardSize());
+        } else if (choice == 1 || choice == JOptionPane.CLOSED_OPTION) {
+            dispose();
+            System.exit(0); // Exit the application
+        }
     }
-}
 
-    /**
-     * Handles the game exit request with modern dialog
-     */
     private void handleGameExit() {
         UIManager.put("OptionPane.background", GameConstants.BACKGROUND_COLOR);
         UIManager.put("Panel.background", GameConstants.BACKGROUND_COLOR);
@@ -351,23 +302,17 @@ public class Minisweeper extends JFrame {
         }
     }
 
-    /**
-     * Updates the mine count display
-     */
+    // to update the mine count
     private void updateMineCount(int count) {
         mineCountLabel.setText(String.format(GameConstants.MINE_COUNT_FORMAT, count));
     }
 
-    /**
-     * Gets the currently selected board size
-     */
+    // to get the selected board size
     private String getSelectedBoardSize() {
         return (String) sizeSelector.getSelectedItem();
     }
 
-    /**
-     * Handles board size change events
-     */
+    // to handle borad size changes
     private void handleBoardSizeChange(String newSize) {
         if (gameStarted) {
             UIManager.put("OptionPane.background", GameConstants.BACKGROUND_COLOR);
@@ -388,36 +333,6 @@ public class Minisweeper extends JFrame {
         }
     }
 
-    /**
-     * Sets up keyboard shortcuts
-     */
-    private void setupKeyBindings() {
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getRootPane().getActionMap();
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK),
-            GameConstants.ACTION_NEW_GAME);
-        actionMap.put(GameConstants.ACTION_NEW_GAME, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startNewGame(getSelectedBoardSize());
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK),
-            GameConstants.ACTION_QUIT);
-        actionMap.put(GameConstants.ACTION_QUIT, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleGameExit();
-            }
-        });
-    }
-
-    /**
-     * Main method to start the application
-     * @param args
-     */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
