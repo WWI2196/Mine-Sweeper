@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
@@ -85,17 +87,59 @@ public class Cell extends JButton {
     }
 
     private void initializeCell() {
-        setPreferredSize(new Dimension(GameConstants.CELL_SIZE, GameConstants.CELL_SIZE));
-        setMargin(new Insets(0, 0, 0, 0));
-        setFont(new Font("Arial", Font.BOLD, GameConstants.CELL_FONT_SIZE));
-        setBorder(BorderFactory.createRaisedBevelBorder());
+        int size = GameConstants.CELL_SIZE;
+        setPreferredSize(new Dimension(size, size));
+        setMinimumSize(new Dimension(size, size));
+        setMaximumSize(new Dimension(size, size));
+
+        // Use smaller padding for better fit
+        setMargin(new Insets(1, 1, 1, 1));
+
+        setFont(GameConstants.BUTTON_FONT);
+
+        // Modern flat design
+        setBorderPainted(true);
         setFocusPainted(false);
+        setContentAreaFilled(true);
         setBackground(GameConstants.CELL_BACKGROUND_COLOR);
-        
-        // Center-align the icon and text
+        setBorder(BorderFactory.createLineBorder(GameConstants.BACKGROUND_COLOR, 1));
+
+        // Center-align content
         setHorizontalAlignment(SwingConstants.CENTER);
         setVerticalAlignment(SwingConstants.CENTER);
-        setIconTextGap(0);
+
+        // Add hover effect
+        addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                if (!isRevealed && !isFlagged) {
+                    setBackground(GameConstants.HOVER_CELL_COLOR);
+                }
+            }
+
+            public void mouseExited(MouseEvent e) {
+                if (!isRevealed && !isFlagged) {
+                    setBackground(GameConstants.CELL_BACKGROUND_COLOR);
+                }
+            }
+        });
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw rounded rectangle background
+        g2d.setColor(getBackground());
+        g2d.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+
+        // Draw subtle border
+        g2d.setColor(new Color(0, 0, 0, 20));
+        g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+
+        super.paintComponent(g2d);
+        g2d.dispose();
     }
 
     public void reveal() {

@@ -47,24 +47,27 @@ public class GameBoard extends JPanel {
      * Initializes the game board
      */
     private void initializeBoard() {
-        setLayout(new GridLayout(rows, cols));
-        setBorder(BorderFactory.createLoweredBevelBorder());
-        cells = new Cell[rows][cols];
+    // Use GridLayout with no gaps between cells
+    setLayout(new GridLayout(rows, cols, 0, 0));
+    setBorder(BorderFactory.createLineBorder(GameConstants.PRIMARY_COLOR, 2));
+    setBackground(GameConstants.BACKGROUND_COLOR);
+    cells = new Cell[rows][cols];
 
-        // Create cells
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                cells[i][j] = new Cell(i, j);
-                cells[i][j].addMouseListener(new CellMouseListener(cells[i][j]));
-                add(cells[i][j]);
-            }
+    // Create cells
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            cells[i][j] = new Cell(i, j);
+            cells[i][j].addMouseListener(new CellMouseListener(cells[i][j]));
+            add(cells[i][j]);
         }
-
-        setPreferredSize(new Dimension(
-            cols * GameConstants.CELL_SIZE,
-            rows * GameConstants.CELL_SIZE
-        ));
     }
+
+    // Set the preferred size based on cell dimensions
+    int boardWidth = cols * GameConstants.CELL_SIZE;
+    int boardHeight = rows * GameConstants.CELL_SIZE;
+    setPreferredSize(new Dimension(boardWidth, boardHeight));
+    setMinimumSize(new Dimension(boardWidth, boardHeight));
+}
 
     /**
      * Places mines on the board, avoiding the first clicked cell
