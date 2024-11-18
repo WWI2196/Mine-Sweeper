@@ -1,17 +1,14 @@
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
+import java.awt.Font;
 
 /**
- * Handles the game timer functionality.
- * Provides methods to start, stop, and reset the timer,
- * and updates the display in the game UI.
+ * Handles the game timer functionality with improved display format.
  */
 public class GameTimer {
     private Timer timer;
     private int seconds;
     private final JLabel display;
-    private final DecimalFormat formatter;
     private boolean isRunning;
 
     /**
@@ -22,9 +19,11 @@ public class GameTimer {
         this.display = display;
         this.seconds = 0;
         this.isRunning = false;
-        this.formatter = new DecimalFormat("000");
         
+        // Set font and initial display
+        display.setFont(new Font("Arial", Font.BOLD, 14));
         initializeTimer();
+        updateDisplay();
     }
 
     /**
@@ -35,17 +34,17 @@ public class GameTimer {
             seconds++;
             updateDisplay();
         };
-        
-        timer = new Timer(1000, timerAction); // Fires every 1000ms (1 second)
+        timer = new Timer(1000, timerAction);
         timer.setInitialDelay(0);
     }
 
     /**
-     * Updates the timer display
+     * Updates the timer display in MM:SS format
      */
     private void updateDisplay() {
-        String timeStr = formatter.format(seconds);
-        display.setText("Time: " + timeStr);
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        display.setText(String.format("Time: %02d:%02d", minutes, remainingSeconds));
     }
 
     /**
@@ -78,14 +77,6 @@ public class GameTimer {
     }
 
     /**
-     * Gets the current elapsed time in seconds
-     * @return elapsed seconds
-     */
-    public int getElapsedSeconds() {
-        return seconds;
-    }
-
-    /**
      * Gets formatted time string (MM:SS)
      * @return formatted time string
      */
@@ -101,53 +92,6 @@ public class GameTimer {
      */
     public boolean isRunning() {
         return isRunning;
-    }
-
-    /**
-     * Sets a custom time format
-     * @param pattern DecimalFormat pattern string
-     */
-    public void setTimeFormat(String pattern) {
-        formatter.applyPattern(pattern);
-        updateDisplay();
-    }
-
-    /**
-     * Adds time change listener
-     * @param listener TimeChangeListener implementation
-     */
-    public void addTimeChangeListener(TimeChangeListener listener) {
-        timer.addActionListener(e -> listener.onTimeChanged(seconds));
-    }
-
-    /**
-     * Interface for time change events
-     */
-    public interface TimeChangeListener {
-        void onTimeChanged(int newSeconds);
-    }
-
-    /**
-     * Sets a time limit for the game
-     * @param timeLimit time limit in seconds
-     * @param listener TimeLimitListener implementation
-     */
-    public void setTimeLimit(int timeLimit, TimeLimitListener listener) {
-        ActionListener timeLimitChecker = e -> {
-            if (seconds >= timeLimit) {
-                stop();
-                listener.onTimeLimitReached();
-            }
-        };
-        Timer limitTimer = new Timer(1000, timeLimitChecker);
-        limitTimer.start();
-    }
-
-    /**
-     * Interface for time limit events
-     */
-    public interface TimeLimitListener {
-        void onTimeLimitReached();
     }
 
     /**
@@ -167,36 +111,6 @@ public class GameTimer {
         if (!isRunning) {
             timer.start();
             isRunning = true;
-        }
-    }
-
-    /**
-     * Adds or subtracts time from the timer
-     * @param secondsToAdd seconds to add (negative to subtract)
-     */
-    public void addTime(int secondsToAdd) {
-        seconds = Math.max(0, seconds + secondsToAdd);
-        updateDisplay();
-    }
-
-    /**
-     * Sets the timer to a specific value
-     * @param newSeconds seconds to set the timer to
-     */
-    public void setTime(int newSeconds) {
-        if (newSeconds >= 0) {
-            seconds = newSeconds;
-            updateDisplay();
-        }
-    }
-
-    /**
-     * Changes the timer update interval
-     * @param milliseconds new interval in milliseconds
-     */
-    public void setUpdateInterval(int milliseconds) {
-        if (milliseconds > 0) {
-            timer.setDelay(milliseconds);
         }
     }
 

@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 /**
  * Represents a single cell in the Minesweeper game.
@@ -13,11 +16,63 @@ public class Cell extends JButton {
     private boolean isFlagged;
     private int adjacentMines;
 
+    // Image icons for cell states
+    private static ImageIcon mineIcon;
+    private static ImageIcon flagIcon;
+    private static ImageIcon wrongIcon;
+    
+    // Static initialization of images
+    static {
+        try {
+            // Load images from resources
+            mineIcon = new ImageIcon(Cell.class.getResource("/images/mine.png"));
+            flagIcon = new ImageIcon(Cell.class.getResource("/images/flag.png"));
+            wrongIcon = new ImageIcon(Cell.class.getResource("/images/wrong.png"));
+            
+            // Scale images to fit cells
+            int iconSize = GameConstants.CELL_SIZE - 6; // Padding
+            mineIcon = scaleIcon(mineIcon, iconSize);
+            flagIcon = scaleIcon(flagIcon, iconSize);
+            wrongIcon = scaleIcon(wrongIcon, iconSize);
+            
+        } catch (Exception e) {
+            System.err.println("Error loading images: " + e.getMessage());
+            // Create simple colored shapes as fallback
+            mineIcon = createFallbackIcon("*", Color.BLACK);
+            flagIcon = createFallbackIcon("F", Color.RED);
+            wrongIcon = createFallbackIcon("X", Color.RED);
+        }
+    }
+
     /**
-     * Constructor for Cell
-     * @param row Row position in the grid
-     * @param col Column position in the grid
+     * Scales an ImageIcon to the specified size
      */
+    private static ImageIcon scaleIcon(ImageIcon icon, int size) {
+        Image img = icon.getImage();
+        Image newImg = img.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        return new ImageIcon(newImg);
+    }
+
+    /**
+     * Creates a fallback icon with text if images fail to load
+     */
+    private static ImageIcon createFallbackIcon(String text, Color color) {
+        int size = GameConstants.CELL_SIZE - 6;
+        JLabel label = new JLabel(text);
+        label.setForeground(color);
+        label.setFont(new Font("Arial", Font.BOLD, size - 4));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setPreferredSize(new Dimension(size, size));
+        
+        BufferedImage image = new BufferedImage(
+            size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        label.paint(g2d);
+        g2d.dispose();
+        
+        return new ImageIcon(image);
+    }
+
     public Cell(int row, int col) {
         this.row = row;
         this.col = col;
@@ -29,161 +84,82 @@ public class Cell extends JButton {
         initializeCell();
     }
 
-    /**
-     * Initializes the cell's visual properties
-     */
     private void initializeCell() {
         setPreferredSize(new Dimension(GameConstants.CELL_SIZE, GameConstants.CELL_SIZE));
         setMargin(new Insets(0, 0, 0, 0));
-        setFont(new Font("Arial", Font.BOLD, 16));
+        setFont(new Font("Arial", Font.BOLD, GameConstants.CELL_FONT_SIZE));
         setBorder(BorderFactory.createRaisedBevelBorder());
         setFocusPainted(false);
         setBackground(GameConstants.CELL_BACKGROUND_COLOR);
+        
+        // Center-align the icon and text
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setIconTextGap(0);
     }
 
-    /**
-     * Reveals the cell's content
-     */
     public void reveal() {
         if (!isRevealed && !isFlagged) {
             isRevealed = true;
             setBorder(BorderFactory.createLoweredBevelBorder());
 
             if (isMine) {
-                // Show mine
+                setIcon(mineIcon);
                 setBackground(GameConstants.MINE_CELL_COLOR);
-                setText("💣");
             } else if (adjacentMines > 0) {
-                // Show number
                 setText(String.valueOf(adjacentMines));
+                setIcon(null);
                 setForeground(GameConstants.NUMBER_COLORS[adjacentMines]);
                 setBackground(GameConstants.REVEALED_CELL_COLOR);
             } else {
-                // Empty cell
                 setText("");
+                setIcon(null);
                 setBackground(GameConstants.REVEALED_CELL_COLOR);
             }
         }
     }
 
-    /**
-     * Flags the cell as potentially containing a mine
-     */
     public void flag() {
         if (!isRevealed) {
             isFlagged = true;
-            setText("🚩");
-            setForeground(Color.RED);
+            setIcon(flagIcon);
         }
     }
 
-    /**
-     * Removes the flag from the cell
-     */
     public void unflag() {
         if (!isRevealed) {
             isFlagged = false;
+            setIcon(null);
             setText("");
         }
     }
 
-    /**
-     * Highlights the cell when the mouse is over it
-     */
+    public void markWrongFlag() {
+        if (isFlagged && !isMine) {
+            setIcon(wrongIcon);
+            setBackground(GameConstants.WRONG_FLAG_COLOR);
+        }
+    }
+
     public void highlight() {
         if (!isRevealed && !isFlagged) {
             setBackground(GameConstants.HOVER_CELL_COLOR);
         }
     }
 
-    /**
-     * Removes the highlight from the cell
-     */
     public void unhighlight() {
         if (!isRevealed && !isFlagged) {
             setBackground(GameConstants.CELL_BACKGROUND_COLOR);
         }
     }
 
-    /**
-     * Marks the cell as a wrongly flagged mine (for game over)
-     */
-    public void markWrongFlag() {
-        if (isFlagged && !isMine) {
-            setText("❌");
-            setBackground(GameConstants.WRONG_FLAG_COLOR);
-        }
-    }
-
     // Getters and setters
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public boolean isMine() {
-        return isMine;
-    }
-
-    public void setMine(boolean mine) {
-        isMine = mine;
-    }
-
-    public boolean isRevealed() {
-        return isRevealed;
-    }
-
-    public boolean isFlagged() {
-        return isFlagged;
-    }
-
-    public int getAdjacentMines() {
-        return adjacentMines;
-    }
-
-    public void setAdjacentMines(int count) {
-        adjacentMines = count;
-    }
-
-    /**
-     * Creates a visual effect when the cell is clicked
-     */
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        
-        // Add a slight 3D effect for unrevealed cells
-        if (!isRevealed) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-                                RenderingHints.VALUE_ANTIALIAS_ON);
-            
-            // Add highlight on top and left edges
-            g2d.setColor(Color.WHITE);
-            g2d.drawLine(0, 0, getWidth() - 1, 0);
-            g2d.drawLine(0, 0, 0, getHeight() - 1);
-            
-            // Add shadow on bottom and right edges
-            g2d.setColor(Color.GRAY);
-            g2d.drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1);
-            g2d.drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1);
-        }
-    }
-
-    /**
-     * Custom UI drawing for different cell states
-     */
-    @Override
-    public void paintBorder(Graphics g) {
-        if (!isRevealed) {
-            super.paintBorder(g);
-        } else {
-            // Flat border for revealed cells
-            g.setColor(Color.GRAY);
-            g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-        }
-    }
+    public int getRow() { return row; }
+    public int getCol() { return col; }
+    public boolean isMine() { return isMine; }
+    public void setMine(boolean mine) { isMine = mine; }
+    public boolean isRevealed() { return isRevealed; }
+    public boolean isFlagged() { return isFlagged; }
+    public int getAdjacentMines() { return adjacentMines; }
+    public void setAdjacentMines(int count) { adjacentMines = count; }
 }
