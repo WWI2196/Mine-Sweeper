@@ -1,6 +1,6 @@
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.Font;
+import java.awt.event.*;
+import java.awt.*;
 
 /*
   class to handle the game timer .

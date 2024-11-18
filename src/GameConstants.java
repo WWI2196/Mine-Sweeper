@@ -1,6 +1,4 @@
-import java.awt.Color;
-import java.awt.Font;
-
+import java.awt.*;
 /*
   class to contain all constant values used in the game
  */

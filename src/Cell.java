@@ -1,9 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 /*
- Represents a single cell in the Minesweeper game.
+ class to represents a single cell in the game
  */
 public class Cell extends JButton {
     private final int row;
